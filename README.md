@@ -1,2 +1,2 @@
 # CodersMeetSpace
-A real-time collaborative workspace for remote workers featuring Kanban boards,group chat, optimistic conflict protection, and secure file aharing powered by Supabase.
+It is an all-in-one, real time developer workspace built to synchronize tasks, team communication, and project. 
