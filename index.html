@@ -7,13 +7,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#090B10">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<!-- Content Security Policy: Restricts sources for scripts, styles, fonts, and images -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' https://unpkg.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src 'self' https://fonts.gstatic.com;
+  img-src 'self' data: https://i.pravatar.cc https://images.unsplash.com;
+  connect-src 'self';
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
+">
+
 <title>CodersMeetSpace — Real-time Developer Workspace</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
-<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<!-- Third-party script loaded with crossorigin attribute -->
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js" crossorigin="anonymous"></script>
 
 <style>
 :root {
@@ -207,7 +224,7 @@ svg { width: 17px; height: 17px; flex: none; }
 .message { display: flex; gap: 9px; margin-bottom: 17px; max-width: 75%; }
 .message.me { margin-left: auto; flex-direction: row-reverse; }
 .message img { width: 29px; height: 29px; border-radius: 50%; }
-.message-body { padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--text); }
+.message-body { padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--text); word-break: break-word; }
 .message.me .message-body { background: var(--surface2); }
 .message-body strong { display: block; color: var(--white); font-size: 11px; margin-bottom: 3px; }
 .message-body p { font-size: 12px; }
@@ -330,28 +347,28 @@ svg { width: 17px; height: 17px; flex: none; }
   </div>
   <nav class="nav">
     <div class="nav-label">Workspace</div>
-    <button class="active" data-view="dashboard">
+    <button class="active" data-view="dashboard" type="button">
       <i data-lucide="layout-dashboard"></i>Dashboard</button>
-    <button data-view="projects">
+    <button data-view="projects" type="button">
       <i data-lucide="folder-kanban"></i>Projects</button>
-    <button data-view="tasks">
+    <button data-view="tasks" type="button">
       <i data-lucide="check-square"></i>
       Tasks
       <span class="nav-count" id="taskCount">0</span>
     </button>
-    <button data-view="chat">
+    <button data-view="chat" type="button">
       <i data-lucide="messages-square"></i>Team Chat</button>
-    <button data-view="files">
+    <button data-view="files" type="button">
       <i data-lucide="files"></i>Files</button>
     <div class="nav-label">Insights</div>
-    <button data-view="analytics">
+    <button data-view="analytics" type="button">
       <i data-lucide="chart-no-axes-combined"></i>Analytics</button>
-    <button data-view="activity">
+    <button data-view="activity" type="button">
       <i data-lucide="activity"></i>Activity</button>
-    <button data-view="ai">
+    <button data-view="ai" type="button">
       <i data-lucide="sparkles"></i>AI Assistant</button>
     <div class="nav-label">System</div>
-    <button data-view="settings">
+    <button data-view="settings" type="button">
       <i data-lucide="settings"></i>Settings</button>
   </nav>
   <div class="sidebar-bottom">
@@ -364,6 +381,7 @@ svg { width: 17px; height: 17px; flex: none; }
     </div>
   </div>
 </aside>
+
 <main class="main">
 <header class="topbar">
   <div class="page-location">
@@ -372,17 +390,18 @@ svg { width: 17px; height: 17px; flex: none; }
   <div class="top-actions">
     <div class="search">
       <i data-lucide="search"></i>
-      <input id="globalSearch" type="search" placeholder="Search tasks, projects...">
+      <input id="globalSearch" type="search" maxlength="80" placeholder="Search tasks, projects...">
     </div>
-    <button class="icon-button" onclick="showNotifications()" aria-label="Notifications">
+    <button class="icon-button" onclick="showNotifications()" aria-label="Notifications" type="button">
       <i data-lucide="bell"></i>
       <span class="notification-badge"></span>
     </button>
-    <button class="icon-button" onclick="openModal('profileModal')" aria-label="Profile">
+    <button class="icon-button" onclick="openModal('profileModal')" aria-label="Profile" type="button">
       <img src="https://i.pravatar.cc/100?img=12" alt="Profile" style="width:27px;height:27px;border-radius:50%">
     </button>
   </div>
 </header>
+
 <section class="view active" id="view-dashboard">
   <div class="hero">
     <div class="wrapper">
@@ -394,9 +413,9 @@ svg { width: 17px; height: 17px; flex: none; }
         projects, tasks, conversations, files and progress in one place.
       </p>
       <div class="hero-actions">
-        <button class="btn btn-primary" onclick="openTaskModal()">
+        <button class="btn btn-primary" onclick="openTaskModal()" type="button">
           <i data-lucide="plus"></i>New task</button>
-        <button class="btn" onclick="switchView('chat')">
+        <button class="btn" onclick="switchView('chat')" type="button">
           <i data-lucide="messages-square"></i>Open team chat</button>
       </div>
       <div class="box-2"></div>
@@ -426,7 +445,7 @@ svg { width: 17px; height: 17px; flex: none; }
           <h2>Active projects</h2>
           <p>Current team work</p>
         </div>
-        <button class="btn btn-small" onclick="switchView('projects')">View all</button>
+        <button class="btn btn-small" onclick="switchView('projects')" type="button">View all</button>
       </div>
       <div class="project-grid" id="dashboardProjects"></div>
     </div>
@@ -446,18 +465,19 @@ svg { width: 17px; height: 17px; flex: none; }
       <h2>Task board</h2>
       <p>Move work from idea to shipped.</p>
     </div>
-    <button class="btn btn-primary" onclick="openTaskModal()">
+    <button class="btn btn-primary" onclick="openTaskModal()" type="button">
       <i data-lucide="plus"></i>Add task</button>
   </div>
   <div class="kanban" id="dashboardKanban"></div>
 </section>
+
 <section class="view" id="view-projects">
   <div class="section-title">
     <div>
       <h2>Projects</h2>
       <p>Manage projects and their members.</p>
     </div>
-    <button class="btn btn-primary" onclick="openModal('projectModal')">
+    <button class="btn btn-primary" onclick="openModal('projectModal')" type="button">
       <i data-lucide="plus"></i>Create project</button>
   </div>
   <div class="grid-2">
@@ -473,24 +493,26 @@ svg { width: 17px; height: 17px; flex: none; }
           <h2>Project members</h2>
           <p>CodersMeetSpace</p>
         </div>
-        <button class="btn btn-small" onclick="openModal('inviteModal')">
+        <button class="btn btn-small" onclick="openModal('inviteModal')" type="button">
           <i data-lucide="user-plus"></i>Invite</button>
       </div>
       <div class="people" id="memberList"></div>
     </div>
   </div>
 </section>
+
 <section class="view" id="view-tasks">
   <div class="section-title">
     <div>
       <h2>Task management</h2>
       <p>Assign, prioritize and track every task.</p>
     </div>
-    <button class="btn btn-primary" onclick="openTaskModal()">
+    <button class="btn btn-primary" onclick="openTaskModal()" type="button">
       <i data-lucide="plus"></i>New task</button>
   </div>
   <div class="kanban" id="mainKanban"></div>
 </section>
+
 <section class="view" id="view-chat">
   <div class="section-title">
     <div>
@@ -509,19 +531,20 @@ svg { width: 17px; height: 17px; flex: none; }
     <div class="messages" id="messages"></div>
     <div class="typing" id="typing">Sarah is typing...</div>
     <form class="chat-input" onsubmit="sendMessage(event)">
-      <input id="chatInput" placeholder="Write a message..." autocomplete="off">
-      <button class="btn btn-primary">
+      <input id="chatInput" placeholder="Write a message..." maxlength="500" autocomplete="off">
+      <button class="btn btn-primary" type="submit">
         <i data-lucide="send"></i>Send</button>
     </form>
   </div>
 </section>
+
 <section class="view" id="view-files">
   <div class="section-title">
     <div>
       <h2>Project Files</h2>
       <p>Shared resources for your team.</p>
     </div>
-    <button class="btn btn-primary" onclick="fakeUpload()">
+    <button class="btn btn-primary" onclick="fakeUpload()" type="button">
       <i data-lucide="upload"></i>Upload file</button>
   </div>
   <div class="grid-2">
@@ -549,6 +572,7 @@ svg { width: 17px; height: 17px; flex: none; }
     </div>
   </div>
 </section>
+
 <section class="view" id="view-analytics">
   <div class="section-title">
     <div>
@@ -580,6 +604,7 @@ svg { width: 17px; height: 17px; flex: none; }
     </div>
   </div>
 </section>
+
 <section class="view" id="view-activity">
   <div class="section-title">
     <div>
@@ -591,6 +616,7 @@ svg { width: 17px; height: 17px; flex: none; }
     <div class="activity-list" id="activityList"></div>
   </div>
 </section>
+
 <section class="view" id="view-ai">
   <div class="section-title">
     <div>
@@ -607,14 +633,15 @@ svg { width: 17px; height: 17px; flex: none; }
       </div>
     </div>
     <div class="ai-prompts">
-      <button class="prompt" onclick="askAI('summary')">Summarize project</button>
-      <button class="prompt" onclick="askAI('standup')">Generate stand-up</button>
-      <button class="prompt" onclick="askAI('risks')">Find project risks</button>
-      <button class="prompt" onclick="askAI('next')">Suggest next tasks</button>
+      <button class="prompt" onclick="askAI('summary')" type="button">Summarize project</button>
+      <button class="prompt" onclick="askAI('standup')" type="button">Generate stand-up</button>
+      <button class="prompt" onclick="askAI('risks')" type="button">Find project risks</button>
+      <button class="prompt" onclick="askAI('next')" type="button">Suggest next tasks</button>
     </div>
     <div class="ai-result" id="aiResult">Select an AI action above.</div>
   </div>
 </section>
+
 <section class="view" id="view-settings">
   <div class="section-title">
     <div>
@@ -628,7 +655,7 @@ svg { width: 17px; height: 17px; flex: none; }
         <strong>Real-time synchronization</strong>
         <span>Connect Supabase Realtime to enable this.</span>
       </div>
-      <button class="switch on" onclick="toggleSwitch(this)">
+      <button class="switch on" onclick="toggleSwitch(this)" type="button">
         <span></span>
       </button>
     </div>
@@ -637,7 +664,7 @@ svg { width: 17px; height: 17px; flex: none; }
         <strong>Task notifications</strong>
         <span>Notify members when tasks change.</span>
       </div>
-      <button class="switch on" onclick="toggleSwitch(this)">
+      <button class="switch on" onclick="toggleSwitch(this)" type="button">
         <span></span>
       </button>
     </div>
@@ -646,14 +673,14 @@ svg { width: 17px; height: 17px; flex: none; }
         <strong>Conflict protection</strong>
         <span>Use task version numbers to detect simultaneous edits.</span>
       </div>
-      <button class="btn btn-small" onclick="openModal('conflictModal')">Test conflict</button>
+      <button class="btn btn-small" onclick="openModal('conflictModal')" type="button">Test conflict</button>
     </div>
     <div class="setting">
       <div>
         <strong>Demo data</strong>
         <span>Reset the local prototype state.</span>
       </div>
-      <button class="btn btn-small" onclick="resetDemo()">Reset</button>
+      <button class="btn btn-small" onclick="resetDemo()" type="button">Reset</button>
     </div>
   </div>
 </section>
@@ -666,19 +693,19 @@ svg { width: 17px; height: 17px; flex: none; }
     <form onsubmit="createTask(event)">
       <div class="form-grid">
         <div class="field full">
-          <label>Task title</label>
-          <input id="taskTitle" required placeholder="e.g. Build authentication">
+          <label for="taskTitle">Task title</label>
+          <input id="taskTitle" required maxlength="100" placeholder="e.g. Build authentication">
         </div>
         <div class="field full">
-          <label>Description</label>
-          <textarea id="taskDescription" placeholder="Describe what needs to be done..."></textarea>
+          <label for="taskDescription">Description</label>
+          <textarea id="taskDescription" maxlength="500" placeholder="Describe what needs to be done..."></textarea>
         </div>
         <div class="field">
-          <label>Project</label>
+          <label for="taskProject">Project</label>
           <select id="taskProject"></select>
         </div>
         <div class="field">
-          <label>Assignee</label>
+          <label for="taskAssignee">Assignee</label>
           <select id="taskAssignee">
             <option>Anurag Kumar</option>
             <option>Sarah Wilson</option>
@@ -687,21 +714,21 @@ svg { width: 17px; height: 17px; flex: none; }
           </select>
         </div>
         <div class="field">
-          <label>Priority</label>
+          <label for="taskPriority">Priority</label>
           <select id="taskPriority">
-            <option>High</option>
-            <option selected>Medium</option>
-            <option>Low</option>
+            <option value="High">High</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="Low">Low</option>
           </select>
         </div>
         <div class="field">
-          <label>Deadline</label>
+          <label for="taskDeadline">Deadline</label>
           <input id="taskDeadline" type="date">
         </div>
       </div>
       <div class="modal-actions">
         <button type="button" class="btn" onclick="closeModal('taskModal')">Cancel</button>
-        <button class="btn btn-primary">
+        <button class="btn btn-primary" type="submit">
           <i data-lucide="plus"></i>Create task</button>
       </div>
     </form>
@@ -713,16 +740,16 @@ svg { width: 17px; height: 17px; flex: none; }
     <h2>Create project</h2>
     <form onsubmit="createProject(event)">
       <div class="field">
-        <label>Project name</label>
-        <input id="projectName" required placeholder="My new project">
+        <label for="projectName">Project name</label>
+        <input id="projectName" required maxlength="60" placeholder="My new project">
       </div>
       <div class="field">
-        <label>Description</label>
-        <textarea id="projectDescription" placeholder="What is your team building?"></textarea>
+        <label for="projectDescription">Description</label>
+        <textarea id="projectDescription" maxlength="300" placeholder="What is your team building?"></textarea>
       </div>
       <div class="modal-actions">
         <button type="button" class="btn" onclick="closeModal('projectModal')">Cancel</button>
-        <button class="btn btn-primary">Create project</button>
+        <button class="btn btn-primary" type="submit">Create project</button>
       </div>
     </form>
   </div>
@@ -733,8 +760,8 @@ svg { width: 17px; height: 17px; flex: none; }
     <h2>Invite team member</h2>
     <form onsubmit="inviteMember(event)">
       <div class="field">
-        <label>Email address</label>
-        <input id="inviteEmail" type="email" required placeholder="developer@example.com">
+        <label for="inviteEmail">Email address</label>
+        <input id="inviteEmail" type="email" required maxlength="100" placeholder="developer@example.com">
       </div>
       <div class="field">
         <label>Role</label>
@@ -747,7 +774,7 @@ svg { width: 17px; height: 17px; flex: none; }
       </div>
       <div class="modal-actions">
         <button type="button" class="btn" onclick="closeModal('inviteModal')">Cancel</button>
-        <button class="btn btn-primary">
+        <button class="btn btn-primary" type="submit">
           <i data-lucide="send"></i>Send invite</button>
       </div>
     </form>
@@ -772,7 +799,7 @@ svg { width: 17px; height: 17px; flex: none; }
       </p>
     </div>
     <div class="modal-actions">
-      <button class="btn" onclick="closeModal('profileModal')">Close</button>
+      <button class="btn" onclick="closeModal('profileModal')" type="button">Close</button>
     </div>
   </div>
 </div>
@@ -782,7 +809,7 @@ svg { width: 17px; height: 17px; flex: none; }
     <h2 id="taskDetailTitle">Task details</h2>
     <div class="conflict-box" id="taskDetailContent"></div>
     <div class="modal-actions">
-      <button class="btn" onclick="closeModal('taskDetailModal')">Close</button>
+      <button class="btn" onclick="closeModal('taskDetailModal')" type="button">Close</button>
     </div>
   </div>
 </div>
@@ -810,9 +837,9 @@ svg { width: 17px; height: 17px; flex: none; }
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn" onclick="closeModal('conflictModal')">Keep mine</button>
-      <button class="btn btn-primary" onclick="closeModal('conflictModal')">Use latest</button>
-      <button class="btn" onclick="closeModal('conflictModal')">Cancel</button>
+      <button class="btn" onclick="closeModal('conflictModal')" type="button">Keep mine</button>
+      <button class="btn btn-primary" onclick="closeModal('conflictModal')" type="button">Use latest</button>
+      <button class="btn" onclick="closeModal('conflictModal')" type="button">Cancel</button>
     </div>
   </div>
 </div>
@@ -844,7 +871,7 @@ svg { width: 17px; height: 17px; flex: none; }
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn" onclick="closeModal('notificationModal')">Close</button>
+      <button class="btn" onclick="closeModal('notificationModal')" type="button">Close</button>
     </div>
   </div>
 </div>
@@ -852,22 +879,26 @@ svg { width: 17px; height: 17px; flex: none; }
 <div class="toast" id="toast"></div>
 
 <script>
-const STATUSES = ["Todo", "In Progress", "Review", "Done"];
+// Prevent global prototype pollution and strict mode execution
+"use strict";
 
-const avatar = {
+const STATUSES = ["Todo", "In Progress", "Review", "Done"];
+const ALLOWED_PRIORITIES = ["High", "Medium", "Low"];
+
+const avatar = Object.freeze({
   "Anurag Kumar": "https://i.pravatar.cc/100?img=12",
   "Sarah Wilson": "https://i.pravatar.cc/100?img=47",
   "Alex Morgan": "https://i.pravatar.cc/100?img=32",
   "Rahul Sharma": "https://i.pravatar.cc/100?img=11"
-};
+});
 
-let projects = [
+const DEFAULT_PROJECTS = [
   { id: 1, name: "CodersMeetSpace", description: "Real-time developer collaboration workspace", progress: 72, image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=700&q=80" },
   { id: 2, name: "Aatmanirbhar Nari", description: "Digital platform for women entrepreneurs", progress: 61, image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=700&q=80" },
   { id: 3, name: "AI Task Assistant", description: "Intelligent project productivity assistant", progress: 38, image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=700&q=80" }
 ];
 
-let tasks = [
+const DEFAULT_TASKS = [
   { id: 1, title: "Build authentication", description: "Create secure login and registration flow.", project: "CodersMeetSpace", assignee: "Anurag Kumar", priority: "High", deadline: "2026-10-06", status: "In Progress", version: 4 },
   { id: 2, title: "Create project dashboard", description: "Build dashboard showing project progress.", project: "CodersMeetSpace", assignee: "Sarah Wilson", priority: "High", deadline: "2026-10-07", status: "Review", version: 3 },
   { id: 3, title: "Realtime task synchronization", description: "Connect database changes to all clients.", project: "CodersMeetSpace", assignee: "Alex Morgan", priority: "High", deadline: "2026-10-08", status: "Todo", version: 2 },
@@ -876,7 +907,7 @@ let tasks = [
   { id: 6, title: "Upload project files", description: "Implement secure shared file storage.", project: "CodersMeetSpace", assignee: "Sarah Wilson", priority: "Low", deadline: "2026-10-13", status: "In Progress", version: 2 }
 ];
 
-let activities = [
+const DEFAULT_ACTIVITIES = [
   ["check", "Sarah moved Dashboard task to Review.", "8 minutes ago"],
   ["message-square", "Rahul commented on Authentication.", "15 minutes ago"],
   ["user-plus", "Alex joined CodersMeetSpace.", "31 minutes ago"],
@@ -884,20 +915,20 @@ let activities = [
   ["git-branch", "Authentication task was updated.", "2 hours ago"]
 ];
 
-let messages = [
-  { user: "Sarah Wilson", text: "Authentication UI is ready for review.", time: "10:42 AM" },
-  { user: "Rahul Sharma", text: "I will test the mobile layout today.", time: "10:45 AM" },
+const DEFAULT_MESSAGES = [
+  { user: "Sarah Wilson", text: "Authentication UI is ready for review.", time: "10:42 AM", me: false },
+  { user: "Rahul Sharma", text: "I will test the mobile layout today.", time: "10:45 AM", me: false },
   { user: "Anurag Kumar", text: "Great. Let's connect Supabase after the UI is stable.", time: "10:47 AM", me: true }
 ];
 
-let files = [
+const DEFAULT_FILES = [
   ["database-schema.pdf", "PDF", "2.4 MB", "Sarah Wilson"],
   ["project-wireframe.fig", "FIG", "4.1 MB", "Rahul Sharma"],
   ["api-documentation.md", "MD", "18 KB", "Anurag Kumar"],
   ["hackathon-presentation.pptx", "PPTX", "6.7 MB", "Alex Morgan"]
 ];
 
-let members = [
+const DEFAULT_MEMBERS = [
   ["Anurag Kumar", "Lead Developer", true],
   ["Sarah Wilson", "Frontend Developer", true],
   ["Alex Morgan", "Backend Developer", true],
@@ -905,29 +936,74 @@ let members = [
   ["Priya Singh", "QA", false]
 ];
 
+let projects = [...DEFAULT_PROJECTS];
+let tasks = [...DEFAULT_TASKS];
+let activities = [...DEFAULT_ACTIVITIES];
+let messages = [...DEFAULT_MESSAGES];
+let files = [...DEFAULT_FILES];
+let members = [...DEFAULT_MEMBERS];
+
 const STORAGE_KEY = "codersmeetspace-v3";
 
+/* --- Security & Sanitization Helpers --- */
+
+// HTML entity encoding to prevent DOM XSS injection
+const esc = value => {
+  if (value === null || value === undefined) return "";
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  }[char]));
+};
+
+// URL validation to prevent javascript: or data: URI execution
+function safeUrl(url, fallback = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=700&q=80") {
+  if (!url || typeof url !== "string") return fallback;
+  try {
+    const parsed = new URL(url.trim(), window.location.href);
+    if (parsed.protocol === "https:" || (parsed.protocol === "http:" && parsed.hostname === "localhost")) {
+      return esc(parsed.href);
+    }
+  } catch (e) {}
+  return fallback;
+}
+
+// Icon identifier whitelist sanitizer
+function safeIcon(iconName) {
+  return /^[a-z0-9-]+$/.test(iconName) ? iconName : "activity";
+}
+
 function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ projects, tasks, activities, messages, files, members }));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ projects, tasks, activities, messages, files, members }));
+  } catch (err) {
+    console.warn("Storage quota exceeded or storage unavailable.", err);
+  }
 }
 
 function load() {
   try {
-    const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (!data) return;
-    projects = data.projects || projects;
-    tasks = data.tasks || tasks;
-    activities = data.activities || activities;
-    messages = data.messages || messages;
-    files = data.files || files;
-    members = data.members || members;
-  } catch (e) {}
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (typeof data !== "object" || data === null) return;
+
+    if (Array.isArray(data.projects)) projects = data.projects;
+    if (Array.isArray(data.tasks)) tasks = data.tasks;
+    if (Array.isArray(data.activities)) activities = data.activities;
+    if (Array.isArray(data.messages)) messages = data.messages;
+    if (Array.isArray(data.files)) files = data.files;
+    if (Array.isArray(data.members)) members = data.members;
+  } catch (e) {
+    console.error("Malformed state in storage. Falling back to defaults.", e);
+    resetDemo();
+  }
 }
 
 const $ = id => document.getElementById(id);
-const esc = value => String(value).replace(/[&<>"']/g, char => ({
-  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
-}[char]));
 
 function toast(message) {
   const el = $("toast");
@@ -938,12 +1014,16 @@ function toast(message) {
 }
 
 function switchView(view) {
+  const validViews = ["dashboard", "projects", "tasks", "chat", "files", "analytics", "activity", "ai", "settings"];
+  if (!validViews.includes(view)) return;
+
   document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
   const target = $("view-" + view);
   if (target) target.classList.add("active");
   document.querySelectorAll(".nav button").forEach(button => {
     button.classList.toggle("active", button.dataset.view === view);
   });
+
   const names = {
     dashboard: "Dashboard",
     projects: "Projects",
@@ -964,23 +1044,24 @@ function renderStats() {
   const total = tasks.length;
   const done = tasks.filter(t => t.status === "Done").length;
   const review = tasks.filter(t => t.status === "Review").length;
-  const open = total - done;
-  const percent = total ? Math.round((done / total) * 100) : 0;
+  const open = Math.max(0, total - done);
+  const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+
   const html = `
     <div class="stat primary">
       <div class="stat-label">
         Workspace completion
         <i data-lucide="target"></i>
       </div>
-      <div class="stat-number">${percent}%</div>
-      <div class="stat-note">${done} of ${total} tasks completed</div>
+      <div class="stat-number">${Number(percent)}%</div>
+      <div class="stat-note">${Number(done)} of ${Number(total)} tasks completed</div>
     </div>
     <div class="stat">
       <div class="stat-label">
         Projects
         <i data-lucide="layers"></i>
       </div>
-      <div class="stat-number">${projects.length}</div>
+      <div class="stat-number">${Number(projects.length)}</div>
       <div class="stat-note">active workspaces</div>
     </div>
     <div class="stat">
@@ -988,7 +1069,7 @@ function renderStats() {
         Open tasks
         <i data-lucide="circle-dot"></i>
       </div>
-      <div class="stat-number">${open}</div>
+      <div class="stat-number">${Number(open)}</div>
       <div class="stat-note">need attention</div>
     </div>
     <div class="stat">
@@ -996,7 +1077,7 @@ function renderStats() {
         In review
         <i data-lucide="eye"></i>
       </div>
-      <div class="stat-number">${review}</div>
+      <div class="stat-number">${Number(review)}</div>
       <div class="stat-note">waiting for review</div>
     </div>
   `;
@@ -1007,10 +1088,12 @@ function renderStats() {
 function projectCard(project) {
   const projectTasks = tasks.filter(t => t.project === project.name);
   const done = projectTasks.filter(t => t.status === "Done").length;
-  const progress = projectTasks.length ? Math.round((done / projectTasks.length) * 100) : project.progress;
+  const progress = projectTasks.length ? Math.round((done / projectTasks.length) * 100) : Number(project.progress) || 0;
+  const clampedProgress = Math.max(0, Math.min(100, progress));
+
   return `
     <div class="project-card">
-      <img class="project-image" src="${project.image}" alt="${esc(project.name)}">
+      <img class="project-image" src="${safeUrl(project.image)}" alt="${esc(project.name)}">
       <div class="project-top">
         <div>
           <div class="project-title">${esc(project.name)}</div>
@@ -1019,11 +1102,11 @@ function projectCard(project) {
         <i data-lucide="more-horizontal"></i>
       </div>
       <div class="progress">
-        <span style="width:${progress}%"></span>
+        <span style="width:${clampedProgress}%"></span>
       </div>
       <div class="progress-meta">
-        <span>${progress}% complete</span>
-        <span>${projectTasks.length} tasks</span>
+        <span>${clampedProgress}% complete</span>
+        <span>${Number(projectTasks.length)} tasks</span>
       </div>
     </div>
   `;
@@ -1039,47 +1122,61 @@ function renderProjects() {
 }
 
 function renderPeople() {
-  const renderItem = person => `
-    <div class="person">
-      <img class="avatar" src="${avatar[person[0]] || 'https://i.pravatar.cc/100'}" alt="${esc(person[0])}">
-      <div class="person-info">
-        <strong>${esc(person[0])}</strong>
-        <span>${esc(person[1])}</span>
+  const renderItem = person => {
+    const name = String(person[0] || "");
+    const role = String(person[1] || "");
+    const isOnline = Boolean(person[2]);
+    const photo = safeUrl(avatar[name] || "https://i.pravatar.cc/100");
+
+    return `
+      <div class="person">
+        <img class="avatar" src="${photo}" alt="${esc(name)}">
+        <div class="person-info">
+          <strong>${esc(name)}</strong>
+          <span>${esc(role)}</span>
+        </div>
+        <span class="online" style="background:${isOnline ? 'var(--green)' : 'var(--muted)'}"></span>
       </div>
-      <span class="online" style="background:${person[2] ? 'var(--green)' : 'var(--muted)'}"></span>
-    </div>
-  `;
+    `;
+  };
   $("teamPeople").innerHTML = members.slice(0, 5).map(renderItem).join("");
   $('memberList').innerHTML = members.map(renderItem).join("");
 }
 
 function taskCard(task) {
   const statusIndex = STATUSES.indexOf(task.status);
+  const rawPriority = String(task.priority || "Medium");
+  const priority = ALLOWED_PRIORITIES.includes(rawPriority) ? rawPriority : "Medium";
+  const priorityClass = priority.toLowerCase();
+  const assigneeName = String(task.assignee || "Unassigned");
+  const assigneeAvatar = safeUrl(avatar[assigneeName] || "https://i.pravatar.cc/100");
+  const taskId = Number(task.id);
+
   return `
     <div class="task-card">
       <div class="task-title">${esc(task.title)}</div>
       <div class="task-description">${esc(task.description)}</div>
       <div class="task-meta">
-        <span class="tag ${task.priority.toLowerCase()}">${task.priority}</span>
+        <span class="tag ${priorityClass}">${esc(priority)}</span>
         <span class="task-assignee">
-          <img src="${avatar[task.assignee] || 'https://i.pravatar.cc/100'}" alt="">${esc(task.assignee.split(" ")[0])}
+          <img src="${assigneeAvatar}" alt="">${esc(assigneeName.split(" ")[0])}
         </span>
       </div>
       <div class="task-bottom">
         <span class="task-date">
-          <i data-lucide="calendar-days"></i>${task.deadline || "No deadline"}
+          <i data-lucide="calendar-days"></i>${esc(task.deadline || "No deadline")}
         </span>
         <div class="task-controls">
           ${statusIndex > 0 ? `
-            <button class="mini-btn" onclick="moveTask(${task.id},-1)" title="Move left">
+            <button class="mini-btn" onclick="moveTask(${taskId}, -1)" title="Move left" type="button">
               <i data-lucide="arrow-left"></i>
             </button>
           ` : ""}
-          <button class="mini-btn" onclick="openTaskDetail(${task.id})" title="Open task">
+          <button class="mini-btn" onclick="openTaskDetail(${taskId})" title="Open task" type="button">
             <i data-lucide="external-link"></i>
           </button>
           ${statusIndex < STATUSES.length - 1 ? `
-            <button class="mini-btn" onclick="moveTask(${task.id},1)" title="Move right">
+            <button class="mini-btn" onclick="moveTask(${taskId}, 1)" title="Move right" type="button">
               <i data-lucide="arrow-right"></i>
             </button>
           ` : ""}
@@ -1090,20 +1187,25 @@ function taskCard(task) {
 }
 
 function renderKanban(target) {
-  const search = $("globalSearch").value.toLowerCase().trim();
+  const searchInput = $("globalSearch").value.toLowerCase().trim().slice(0, 80);
   $(target).innerHTML = STATUSES.map(status => {
     const filtered = tasks.filter(task => {
       const matchesStatus = task.status === status;
-      const matchesSearch = !search || (
-        task.title + task.description + task.project + task.assignee
-      ).toLowerCase().includes(search);
+      const haystack = (
+        String(task.title || "") + 
+        String(task.description || "") + 
+        String(task.project || "") + 
+        String(task.assignee || "")
+      ).toLowerCase();
+      const matchesSearch = !searchInput || haystack.includes(searchInput);
       return matchesStatus && matchesSearch;
     });
+
     return `
       <div class="column">
         <div class="column-header">
-          <span>${status}</span>
-          <span class="column-count">${filtered.length}</span>
+          <span>${esc(status)}</span>
+          <span class="column-count">${Number(filtered.length)}</span>
         </div>
         ${filtered.length ? filtered.map(taskCard).join("") : `
           <div style="color:var(--muted);padding:25px 7px;font-size:11px">No tasks here</div>
@@ -1114,18 +1216,24 @@ function renderKanban(target) {
 }
 
 function moveTask(id, direction) {
-  const task = tasks.find(t => t.id === id);
+  const numericId = Number(id);
+  const task = tasks.find(t => Number(t.id) === numericId);
   if (!task) return;
+
   const current = STATUSES.indexOf(task.status);
-  const next = Math.max(0, Math.min(STATUSES.length - 1, current + direction));
+  if (current === -1) return;
+
+  const next = Math.max(0, Math.min(STATUSES.length - 1, current + Number(direction)));
   task.status = STATUSES[next];
-  task.version++;
+  task.version = (Number(task.version) || 1) + 1;
+
   activities.unshift([
     "move-right",
     `${task.assignee} moved "${task.title}" to ${task.status}.`,
     "Just now"
   ]);
   activities = activities.slice(0, 10);
+
   save();
   renderAll();
   toast(`Task moved to ${task.status}`);
@@ -1138,17 +1246,29 @@ function openTaskModal() {
 
 function createTask(event) {
   event.preventDefault();
+  const title = $("taskTitle").value.trim().slice(0, 100);
+  const description = $('taskDescription').value.trim().slice(0, 500);
+  const project = $("taskProject").value;
+  const assignee = $('taskAssignee').value;
+  const priorityRaw = $("taskPriority").value;
+  const priority = ALLOWED_PRIORITIES.includes(priorityRaw) ? priorityRaw : "Medium";
+  const deadlineRaw = $('taskDeadline').value;
+  const deadline = /^\d{4}-\d{2}-\d{2}$/.test(deadlineRaw) ? deadlineRaw : "";
+
+  if (!title) return;
+
   const task = {
     id: Date.now(),
-    title: $("taskTitle").value.trim(),
-    description: $('taskDescription').value.trim(),
-    project: $("taskProject").value,
-    assignee: $('taskAssignee').value,
-    priority: $("taskPriority").value,
-    deadline: $('taskDeadline').value,
+    title,
+    description,
+    project,
+    assignee,
+    priority,
+    deadline,
     status: "Todo",
     version: 1
   };
+
   tasks.unshift(task);
   activities.unshift(["plus", `Created "${task.title}".`, "Just now"]);
   closeModal("taskModal");
@@ -1159,8 +1279,10 @@ function createTask(event) {
 }
 
 function openTaskDetail(id) {
-  const task = tasks.find(t => t.id === id);
+  const numericId = Number(id);
+  const task = tasks.find(t => Number(t.id) === numericId);
   if (!task) return;
+
   $("taskDetailTitle").textContent = task.title;
   $("taskDetailContent").innerHTML = `
     <h3>${esc(task.title)}</h3>
@@ -1168,8 +1290,8 @@ function openTaskDetail(id) {
     <div style="margin-top:14px"><strong style="color:var(--white)">Project: </strong>${esc(task.project)}</div>
     <div style="margin-top:6px"><strong style="color:var(--white)">Assignee: </strong>${esc(task.assignee)}</div>
     <div style="margin-top:6px"><strong style="color:var(--white)">Priority: </strong>${esc(task.priority)}</div>
-    <div style="margin-top:6px"><strong style="color:var(--white)">Deadline: </strong>${task.deadline || "Not set"}</div>
-    <div style="margin-top:6px"><strong style="color:var(--white)">Version: </strong>v${task.version}</div>
+    <div style="margin-top:6px"><strong style="color:var(--white)">Deadline: </strong>${esc(task.deadline || "Not set")}</div>
+    <div style="margin-top:6px"><strong style="color:var(--white)">Version: </strong>v${Number(task.version) || 1}</div>
     <hr style="border:0;border-top:1px solid var(--line);margin:17px 0">
     <strong style="color:var(--white)">Comments</strong>
     <p style="margin-top:8px">Sarah: Please review the API contract before merging.</p>
@@ -1179,33 +1301,42 @@ function openTaskDetail(id) {
 }
 
 function renderMessages() {
-  $("messages").innerHTML = messages.map(message => `
-    <div class="message ${message.me ? "me" : ""}">
-      <img src="${avatar[message.user] || 'https://i.pravatar.cc/100'}" alt="">
-      <div class="message-body">
-        <strong>${esc(message.user)}</strong>
-        <p>${esc(message.text)}</p>
-        <small>${message.time}</small>
+  $("messages").innerHTML = messages.map(message => {
+    const user = String(message.user || "Teammate");
+    const photo = safeUrl(avatar[user] || "https://i.pravatar.cc/100");
+    const isMe = Boolean(message.me);
+
+    return `
+      <div class="message ${isMe ? "me" : ""}">
+        <img src="${photo}" alt="">
+        <div class="message-body">
+          <strong>${esc(user)}</strong>
+          <p>${esc(message.text)}</p>
+          <small>${esc(message.time)}</small>
+        </div>
       </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 function sendMessage(event) {
   event.preventDefault();
   const input = $('chatInput');
-  const text = input.value.trim();
+  const text = input.value.trim().slice(0, 500);
   if (!text) return;
+
   messages.push({
     user: "Anurag Kumar",
     text,
     time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     me: true
   });
+
   activities.unshift(["message-square", "You sent a message in #development.", "Just now"]);
   input.value = "";
   save();
   renderAll();
+
   setTimeout(() => {
     $("typing").textContent = "Sarah is typing...";
   }, 300);
@@ -1217,9 +1348,9 @@ function renderFiles() {
       <div class="file-icon"><i data-lucide="file-text"></i></div>
       <div class="file-info">
         <strong>${esc(file[0])}</strong>
-        <span>${file[1]} · ${file[2]} · ${file[3]}</span>
+        <span>${esc(file[1])} · ${esc(file[2])} · ${esc(file[3])}</span>
       </div>
-      <button class="mini-btn"><i data-lucide="download"></i></button>
+      <button class="mini-btn" type="button"><i data-lucide="download"></i></button>
     </div>
   `).join("");
 }
@@ -1236,11 +1367,11 @@ function renderActivity() {
   $("activityList").innerHTML = activities.map(item => `
     <div class="activity-item">
       <div class="activity-icon">
-        <i data-lucide="${item[0]}"></i>
+        <i data-lucide="${safeIcon(item[0])}"></i>
       </div>
       <div>
         <strong>${esc(item[1])}</strong>
-        <span>${item[2]}</span>
+        <span>${esc(item[2])}</span>
       </div>
     </div>
   `).join("");
@@ -1252,17 +1383,22 @@ function renderWorkload() {
     tasks.filter(t => t.assignee === member[0]).length
   ]);
   const max = Math.max(1, ...people.map(p => p[1]));
-  $('workload').innerHTML = people.map(person => `
-    <div style="margin-bottom:17px">
-      <div style="display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-bottom:5px">
-        <span>${esc(person[0])}</span>
-        <span>${person[1]} tasks</span>
+
+  $('workload').innerHTML = people.map(person => {
+    const count = Number(person[1]) || 0;
+    const pct = Math.max(0, Math.min(100, Math.round((count / max) * 100)));
+    return `
+      <div style="margin-bottom:17px">
+        <div style="display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-bottom:5px">
+          <span>${esc(person[0])}</span>
+          <span>${count} tasks</span>
+        </div>
+        <div class="progress">
+          <span style="width:${pct}%"></span>
+        </div>
       </div>
-      <div class="progress">
-        <span style="width:${(person[1] / max) * 100}%"></span>
-      </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 function askAI(type) {
@@ -1282,9 +1418,10 @@ function askAI(type) {
 
 function createProject(event) {
   event.preventDefault();
-  const name = $('projectName').value.trim();
-  const description = $("projectDescription").value.trim();
+  const name = $('projectName').value.trim().slice(0, 60);
+  const description = $("projectDescription").value.trim().slice(0, 300);
   if (!name) return;
+
   projects.push({
     id: Date.now(),
     name,
@@ -1292,6 +1429,7 @@ function createProject(event) {
     progress: 0,
     image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=700&q=80"
   });
+
   activities.unshift(["folder-plus", `Created project "${name}".`, "Just now"]);
   closeModal("projectModal");
   event.target.reset();
@@ -1302,7 +1440,7 @@ function createProject(event) {
 
 function inviteMember(event) {
   event.preventDefault();
-  const email = $('inviteEmail').value.trim();
+  const email = $('inviteEmail').value.trim().slice(0, 100);
   closeModal("inviteModal");
   event.target.reset();
   toast(`Invitation prepared for ${email}. Connect Supabase Auth for real invitations.`);
@@ -1339,14 +1477,16 @@ function toggleSwitch(button) {
 }
 
 function resetDemo() {
-  localStorage.removeItem(STORAGE_KEY);
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (e) {}
   location.reload();
 }
 
 $("globalSearch").addEventListener("input", () => {
   renderKanban("dashboardKanban");
   renderKanban("mainKanban");
-  lucide.createIcons();
+  if (window.lucide) lucide.createIcons();
 });
 
 document.querySelectorAll(".nav button").forEach(button => {
@@ -1364,7 +1504,7 @@ function renderAll() {
   renderActivity();
   renderWorkload();
   $('taskCount').textContent = tasks.filter(t => t.status !== "Done").length;
-  lucide.createIcons();
+  if (window.lucide) lucide.createIcons();
 }
 
 load();
