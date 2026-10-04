@@ -1,0 +1,1514 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090B10">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<!-- Content Security Policy: Restricts sources for scripts, styles, fonts, and images -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' https://unpkg.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src 'self' https://fonts.gstatic.com;
+  img-src 'self' data: https://i.pravatar.cc https://images.unsplash.com;
+  connect-src 'self';
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
+">
+
+<title>CodersMeetSpace — Real-time Developer Workspace</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+<!-- Third-party script loaded with crossorigin attribute -->
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js" crossorigin="anonymous"></script>
+
+<style>
+:root {
+  --bg: #090B10;
+  --sidebar: #0D1117;
+  --panel: #111620;
+  --surface: #161D2B;
+  --surface2: #1E273A; 
+  --line: #222B3D;
+  --line2: #34425D;
+  --white: #F1F5F9;
+  --text: #94A3B8;
+  --muted: #64748B;
+  --blue: #4F6BFF;
+  --blue2: #637BFF;
+  --cyan: #06B6D4;
+  --green: #10B981;
+  --amber: #F59E0B;
+  --red: #F43F5E;
+  --danger-bg: rgba(244, 63, 94, 0.15);
+  --green-bg: rgba(16, 185, 129, 0.15);
+  --amber-bg: rgba(245, 158, 11, 0.15);
+  --radius: 10px;
+  --radius-lg: 18px;
+  --sidebar-width: 245px;
+  --heading: "Space Grotesk", sans-serif;
+  --body: "DM Sans", sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; color-scheme: dark; }
+body { min-height: 100vh; background: var(--bg); color: var(--text); font: 14px/1.5 var(--body); overflow-x: hidden; }
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+svg { width: 17px; height: 17px; flex: none; }
+:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--line2); }
+
+.app { min-height: 100vh; }
+.sidebar { position: fixed; inset: 0 auto 0 0; width: var(--sidebar-width); background: var(--sidebar); border-right: 1px solid var(--line); padding: 22px 15px; z-index: 50; display: flex; flex-direction: column; }
+.brand { display: flex; align-items: center; gap: 11px; padding: 0 9px; margin-bottom: 30px; }
+.brand-mark { width: 38px; height: 38px; border-radius: 9px; background: var(--blue); color: #fff; display: grid; place-items: center; font: 700 17px var(--heading); }
+.brand-name { color: var(--white); font: 600 16px var(--heading); }
+.brand-name span { color: var(--cyan); }
+.workspace { margin: 0 7px 22px; padding: 11px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.workspace small { display: block; color: var(--muted); font-size: 11px; margin-bottom: 3px; }
+.workspace strong { display: flex; align-items: center; justify-content: space-between; color: var(--white); font-size: 13px; }
+.live-dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2); }
+.nav { display: flex; flex-direction: column; gap: 3px; }
+.nav-label { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; padding: 14px 11px 6px; }
+.nav button { position: relative; width: 100%; border: 0; background: transparent; color: var(--muted); display: flex; align-items: center; gap: 11px; padding: 10px 11px; border-radius: 8px; text-align: left; transition: .2s; }
+.nav button:hover { color: var(--white); background: var(--surface); }
+.nav button.active { color: var(--white); background: var(--surface2); }
+.nav button.active::before { content: ""; position: absolute; left: 0; top: 9px; bottom: 9px; width: 2px; background: var(--cyan); border-radius: 3px; }
+.nav-count { margin-left: auto; min-width: 20px; height: 20px; display: grid; place-items: center; padding: 0 5px; border-radius: 5px; background: var(--blue); color: white; font-size: 10px; }
+.sidebar-bottom { margin-top: auto; }
+.user-card { display: flex; align-items: center; gap: 10px; padding: 11px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line2); }
+.user-card div { min-width: 0; }
+.user-card strong { display: block; color: var(--white); font-size: 12px; }
+.user-card span { color: var(--muted); font-size: 11px; }
+
+.main { margin-left: var(--sidebar-width); min-width: 0; padding: 22px 4.5% 70px; }
+.topbar { min-height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 27px; }
+.page-location { color: var(--muted); }
+.page-location strong { color: var(--white); }
+.top-actions { display: flex; align-items: center; gap: 8px; }
+.search { width: 270px; height: 39px; display: flex; align-items: center; gap: 8px; padding: 0 11px; border: 1px solid var(--line); background: var(--panel); border-radius: 8px; }
+.search svg { color: var(--muted); }
+.search input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--white); }
+.search input::placeholder { color: var(--muted); }
+.icon-button { width: 39px; height: 39px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); position: relative; }
+.icon-button:hover { background: var(--surface2); color: var(--white); }
+.notification-badge { position: absolute; top: 5px; right: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
+
+.view { display: none; animation: viewIn .25s ease; }
+.view.active { display: block; }
+@keyframes viewIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: none; }
+}
+
+.hero { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr); gap: 18px; margin-bottom: 18px; }
+.wrapper { min-height: 310px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--panel); padding: 34px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+.eyebrow { display: flex; align-items: center; gap: 8px; color: var(--cyan); text-transform: uppercase; letter-spacing: 1.4px; font-size: 10px; font-weight: 700; margin-bottom: 14px; }
+.wrapper h1 { max-width: 700px; font: 700 clamp(38px, 5vw, 66px)/.98 var(--heading); letter-spacing: -2px; color: var(--white); }
+.wrapper p { max-width: 590px; margin-top: 17px; color: var(--muted); line-height: 1.7; font-size: 15px; }
+.hero-actions { display: flex; gap: 8px; margin-top: 22px; flex-wrap: wrap; }
+.box-2 { position: absolute; bottom: 0; left: 0; height: 3px; width: 34%; background: var(--blue); }
+.box-1 { min-height: 310px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: #111622; position: relative; overflow: hidden; perspective: 900px; }
+.hero-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .12; filter: grayscale(1); }
+.scene { position: absolute; inset: 0; display: grid; place-items: center; perspective: 700px; }
+.cube { width: 125px; height: 125px; position: relative; transform-style: preserve-3d; animation: floatCube 7s ease-in-out infinite; }
+.face { position: absolute; inset: 0; border: 1px solid rgba(6, 182, 212, 0.4); background: rgba(17, 22, 32, 0.85); display: grid; place-items: center; color: var(--cyan); backdrop-filter: blur(4px); }
+.face svg { width: 30px; height: 30px; }
+.front { transform: translateZ(62px); }
+.back { transform: rotateY(180deg) translateZ(62px); }
+.right { transform: rotateY(90deg) translateZ(62px); }
+.left { transform: rotateY(-90deg) translateZ(62px); }
+.top { transform: rotateX(90deg) translateZ(62px); }
+.bottom { transform: rotateX(-90deg) translateZ(62px); }
+
+@keyframes floatCube {
+  0%, 100% { transform: rotateX(-12deg) rotateY(25deg) translateY(0); }
+  50% { transform: rotateX(12deg) rotateY(205deg) translateY(-12px); }
+}
+
+.visual-label { position: absolute; left: 17px; bottom: 16px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 7px; background: rgba(17, 22, 32, 0.9); color: var(--muted); font-size: 11px; }
+.visual-label strong { color: var(--white); }
+
+.btn { min-height: 38px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--white); font-weight: 600; transition: transform .18s, background .18s, border-color .18s; }
+.btn:hover { transform: translateY(-2px); background: var(--surface2); border-color: var(--line2); }
+.btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+.btn-primary:hover { background: var(--blue2); border-color: var(--blue2); }
+.btn-small { min-height: 31px; padding: 0 10px; font-size: 12px; }
+
+.stats { display: grid; grid-template-columns: 1.5fr repeat(3, .7fr); gap: 10px; margin-bottom: 18px; }
+.stat { min-height: 112px; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); }
+.stat.primary { background: var(--surface2); border-radius: var(--radius-lg); }
+.stat-label { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 12px; }
+.stat-label svg { color: var(--cyan); }
+.stat-number { margin-top: 10px; color: var(--white); font: 600 31px var(--heading); }
+.stat.primary .stat-number { font-size: 44px; }
+.stat-note { color: var(--muted); font-size: 11px; }
+
+.panel { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); overflow: hidden; }
+.panel-head { padding: 16px 18px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.panel-head h2 { color: var(--white); font: 600 16px var(--heading); }
+.panel-head p { color: var(--muted); font-size: 12px; }
+
+.grid-2 { display: grid; grid-template-columns: 1.3fr .7fr; gap: 18px; }
+.project-grid { display: grid; grid-template-columns: repeat(2, 1fr); }
+.project-card { min-height: 190px; padding: 18px; border-bottom: 1px solid var(--line); transition: .2s; position: relative; overflow: hidden; }
+.project-card:nth-child(odd) { border-right: 1px solid var(--line); }
+.project-card:hover { background: var(--surface); }
+.project-image { width: 100%; height: 72px; object-fit: cover; border-radius: 8px; margin-bottom: 13px; opacity: .8; }
+.project-top { display: flex; justify-content: space-between; gap: 10px; }
+.project-title { color: var(--white); font: 600 15px var(--heading); }
+.project-description { color: var(--muted); margin-top: 3px; font-size: 12px; }
+.progress { height: 4px; background: var(--line); border-radius: 5px; margin-top: 15px; overflow: hidden; }
+.progress span { display: block; height: 100%; background: var(--blue); border-radius: 5px; }
+.progress-meta { display: flex; justify-content: space-between; margin-top: 6px; color: var(--muted); font-size: 10px; }
+
+.people { padding: 7px 18px; }
+.person { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.person:last-child { border-bottom: 0; }
+.person-info { flex: 1; }
+.person-info strong { display: block; color: var(--white); font-size: 12px; }
+.person-info span { color: var(--muted); font-size: 10px; }
+.online { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+
+.activity-list { padding: 6px 18px; }
+.activity-item { display: grid; grid-template-columns: 30px 1fr; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.activity-item:last-child { border: 0; }
+.activity-icon { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 7px; background: var(--surface2); color: var(--cyan); }
+.activity-item strong { color: var(--white); }
+.activity-item span { color: var(--muted); display: block; font-size: 10px; margin-top: 3px; }
+
+.section-title { display: flex; align-items: flex-end; justify-content: space-between; margin: 30px 0 13px; }
+.section-title h2 { color: var(--white); font: 600 23px var(--heading); }
+.section-title p { color: var(--muted); margin-top: 2px; font-size: 12px; }
+
+.kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.column { min-height: 300px; padding: 11px; border: 1px solid var(--line); border-radius: var(--radius); background: #0E131E; }
+.column-header { display: flex; align-items: center; justify-content: space-between; color: var(--white); font-weight: 600; padding: 4px 2px 11px; }
+.column-count { min-width: 22px; height: 22px; padding: 0 5px; display: grid; place-items: center; border-radius: 6px; background: var(--surface2); color: var(--white); font-size: 10px; }
+.task-card { padding: 13px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; margin-bottom: 8px; transition: .2s; }
+.task-card:hover { transform: translateY(-2px); border-color: var(--line2); }
+.task-title { color: var(--white); font-size: 13px; font-weight: 600; }
+.task-description { color: var(--muted); font-size: 11px; margin-top: 4px; }
+.task-meta { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 12px; }
+.tag { display: inline-flex; align-items: center; padding: 3px 7px; border-radius: 5px; font-size: 10px; font-weight: 600; }
+.tag.high { color: var(--red); background: var(--danger-bg); }
+.tag.medium { color: var(--amber); background: var(--amber-bg); }
+.tag.low { color: var(--green); background: var(--green-bg); }
+.task-assignee { display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: 10px; }
+.task-assignee img { width: 21px; height: 21px; border-radius: 50%; }
+.task-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 11px; }
+.task-date { color: var(--muted); font-size: 10px; display: flex; align-items: center; gap: 4px; }
+.task-controls { display: flex; gap: 4px; }
+.mini-btn { width: 27px; height: 27px; display: grid; place-items: center; border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 6px; }
+.mini-btn:hover { color: var(--white); border-color: var(--line2); background: var(--surface2); }
+
+.chat { height: 500px; display: grid; grid-template-rows: auto 1fr auto; }
+.messages { padding: 18px; overflow: auto; }
+.message { display: flex; gap: 9px; margin-bottom: 17px; max-width: 75%; }
+.message.me { margin-left: auto; flex-direction: row-reverse; }
+.message img { width: 29px; height: 29px; border-radius: 50%; }
+.message-body { padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--text); word-break: break-word; }
+.message.me .message-body { background: var(--surface2); }
+.message-body strong { display: block; color: var(--white); font-size: 11px; margin-bottom: 3px; }
+.message-body p { font-size: 12px; }
+.message-body small { display: block; color: var(--muted); margin-top: 4px; font-size: 9px; }
+.typing { padding: 0 18px 8px; color: var(--muted); font-size: 10px; }
+.chat-input { display: flex; gap: 7px; padding: 12px; border-top: 1px solid var(--line); }
+.chat-input input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--white); padding: 10px; outline: 0; }
+
+.file-list { padding: 8px 18px; }
+.file { display: flex; align-items: center; gap: 11px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.file:last-child { border: 0; }
+.file-icon { width: 35px; height: 35px; display: grid; place-items: center; border-radius: 7px; background: var(--surface2); color: var(--cyan); }
+.file-info { flex: 1; }
+.file-info strong { color: var(--white); display: block; font-size: 12px; }
+.file-info span { color: var(--muted); font-size: 10px; }
+
+.chart { height: 220px; padding: 20px; display: flex; align-items: flex-end; gap: 12px; }
+.bar-chart { flex: 1; height: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 5px; }
+.bar-chart span { width: 25px; max-width: 100%; background: var(--blue); border-radius: 4px 4px 0 0; transition: height .5s; }
+
+.ai-panel { min-height: 390px; padding: 24px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--panel); }
+.ai-head { display: flex; align-items: center; gap: 12px; }
+.ai-icon { width: 45px; height: 45px; display: grid; place-items: center; background: var(--surface2); color: var(--cyan); border-radius: 10px; }
+.ai-head h2 { color: var(--white); font: 600 20px var(--heading); }
+.ai-head p { color: var(--muted); font-size: 11px; }
+.ai-prompts { display: flex; flex-wrap: wrap; gap: 7px; margin: 23px 0 16px; }
+.prompt { border: 1px solid var(--line); background: var(--surface); color: var(--text); padding: 7px 10px; border-radius: 7px; font-size: 11px; transition: .2s; }
+.prompt:hover { background: var(--surface2); color: var(--white); }
+.ai-result { min-height: 145px; padding: 16px; border: 1px solid var(--line); border-radius: 9px; background: var(--bg); color: var(--text); white-space: pre-line; }
+
+.conflict-box { padding: 20px; border-left: 3px solid var(--amber); background: rgba(245, 158, 11, 0.08); border-radius: 4px; }
+.conflict-box h3 { color: var(--white); font: 600 17px var(--heading); }
+.conflict-box p { color: var(--muted); margin-top: 5px; }
+.version { margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.version-card { padding: 13px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.version-card strong { display: block; color: var(--white); font-size: 12px; }
+.version-card span { display: block; color: var(--muted); margin-top: 5px; font-size: 11px; }
+
+.setting { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px; border-bottom: 1px solid var(--line); }
+.setting:last-child { border: 0; }
+.setting strong { display: block; color: var(--white); }
+.setting span { color: var(--muted); font-size: 11px; }
+.switch { width: 43px; height: 24px; border: 0; border-radius: 20px; background: var(--line2); padding: 3px; }
+.switch span { display: block; width: 18px; height: 18px; border-radius: 50%; background: white; transition: .2s; }
+.switch.on { background: var(--blue); }
+.switch.on span { transform: translateX(19px); }
+
+.modal { position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center; padding: 15px; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); }
+.modal.show { display: flex; }
+.modal-box { width: min(600px, 100%); max-height: 90vh; overflow: auto; padding: 23px; border: 1px solid var(--line); border-radius: 15px; background: var(--panel); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6); }
+.modal-box h2 { color: var(--white); font: 600 20px var(--heading); margin-bottom: 18px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+.field { margin-bottom: 12px; }
+.field.full { grid-column: 1/-1; }
+.field label { display: block; color: var(--muted); font-size: 11px; margin-bottom: 5px; }
+.field input, .field textarea, .field select { width: 100%; border: 1px solid var(--line); border-radius: 7px; background: var(--bg); color: var(--white); padding: 10px; outline: 0; }
+.field select option { background: var(--panel); color: var(--white); }
+.field textarea { min-height: 100px; resize: vertical; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 7px; margin-top: 15px; }
+
+.toast { position: fixed; right: 20px; bottom: 20px; z-index: 200; padding: 11px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface2); color: var(--white); transform: translateY(15px); opacity: 0; pointer-events: none; transition: .25s; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+.toast.show { opacity: 1; transform: none; }
+
+@media(max-width: 1100px) {
+  .hero { grid-template-columns: 1fr; }
+  .box-1 { min-height: 250px; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .stat.primary { grid-column: 1/-1; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .kanban { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media(max-width: 760px) {
+  :root { --sidebar-width: 0px; }
+  .sidebar { position: fixed; left: 0; right: 0; top: auto; bottom: 0; width: 100%; height: 68px; padding: 7px 8px; border-right: 0; border-top: 1px solid var(--line); background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(10px); flex-direction: row; }
+  .brand, .workspace, .sidebar-bottom { display: none; }
+  .nav { width: 100%; flex-direction: row; justify-content: space-around; gap: 3px; }
+  .nav-label { display: none; }
+  .nav button { flex: 1; flex-direction: column; justify-content: center; gap: 3px; padding: 7px 2px; font-size: 9px; text-align: center; }
+  .nav button.active::before { top: auto; bottom: 0; left: 20%; right: 20%; width: auto; height: 2px; }
+  .nav-count { display: none; }
+  .main { padding: 13px 12px 90px; }
+  .topbar { flex-wrap: wrap; margin-bottom: 17px; }
+  .page-location { display: none; }
+  .top-actions { width: 100%; }
+  .search { flex: 1; width: auto; }
+  .wrapper { min-height: 350px; padding: 25px 21px; }
+  .wrapper h1 { font-size: 41px; letter-spacing: -1.5px; }
+  .box-1 { min-height: 230px; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .stat.primary { grid-column: 1/-1; }
+  .stat-number { font-size: 25px; }
+  .project-grid { grid-template-columns: 1fr; }
+  .project-card:nth-child(odd) { border-right: 0; }
+  .kanban { grid-template-columns: 1fr; }
+  .column { min-height: 150px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .field.full { grid-column: auto; }
+  .version { grid-template-columns: 1fr; }
+}
+
+@media(prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">C</div>
+    <div class="brand-name">Coders<span>Meet</span>Space</div>
+  </div>
+  <div class="workspace">
+    <small>WORKSPACE</small>
+    <strong>
+      Developer Team
+      <span class="live-dot"></span>
+    </strong>
+  </div>
+  <nav class="nav">
+    <div class="nav-label">Workspace</div>
+    <button class="active" data-view="dashboard" type="button">
+      <i data-lucide="layout-dashboard"></i>Dashboard</button>
+    <button data-view="projects" type="button">
+      <i data-lucide="folder-kanban"></i>Projects</button>
+    <button data-view="tasks" type="button">
+      <i data-lucide="check-square"></i>
+      Tasks
+      <span class="nav-count" id="taskCount">0</span>
+    </button>
+    <button data-view="chat" type="button">
+      <i data-lucide="messages-square"></i>Team Chat</button>
+    <button data-view="files" type="button">
+      <i data-lucide="files"></i>Files</button>
+    <div class="nav-label">Insights</div>
+    <button data-view="analytics" type="button">
+      <i data-lucide="chart-no-axes-combined"></i>Analytics</button>
+    <button data-view="activity" type="button">
+      <i data-lucide="activity"></i>Activity</button>
+    <button data-view="ai" type="button">
+      <i data-lucide="sparkles"></i>AI Assistant</button>
+    <div class="nav-label">System</div>
+    <button data-view="settings" type="button">
+      <i data-lucide="settings"></i>Settings</button>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <img class="avatar" src="https://i.pravatar.cc/100?img=12" alt="Anurag Kumar">
+      <div>
+        <strong>Anurag Kumar</strong>
+        <span>Developer · Demo mode</span>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+<header class="topbar">
+  <div class="page-location">
+    CodersMeetSpace / <strong id="pageName">Dashboard</strong>
+  </div>
+  <div class="top-actions">
+    <div class="search">
+      <i data-lucide="search"></i>
+      <input id="globalSearch" type="search" maxlength="80" placeholder="Search tasks, projects...">
+    </div>
+    <button class="icon-button" onclick="showNotifications()" aria-label="Notifications" type="button">
+      <i data-lucide="bell"></i>
+      <span class="notification-badge"></span>
+    </button>
+    <button class="icon-button" onclick="openModal('profileModal')" aria-label="Profile" type="button">
+      <img src="https://i.pravatar.cc/100?img=12" alt="Profile" style="width:27px;height:27px;border-radius:50%">
+    </button>
+  </div>
+</header>
+
+<section class="view active" id="view-dashboard">
+  <div class="hero">
+    <div class="wrapper">
+      <div class="eyebrow">
+        <i data-lucide="radio"></i>Live developer workspace</div>
+      <h1>Build together.<br>Ship smarter.</h1>
+      <p>
+        A collaborative workspace where developer teams manage
+        projects, tasks, conversations, files and progress in one place.
+      </p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="openTaskModal()" type="button">
+          <i data-lucide="plus"></i>New task</button>
+        <button class="btn" onclick="switchView('chat')" type="button">
+          <i data-lucide="messages-square"></i>Open team chat</button>
+      </div>
+      <div class="box-2"></div>
+    </div>
+    <div class="box-1">
+      <img class="hero-image" src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1000&q=80" alt="Developer workspace">
+      <div class="scene">
+        <div class="cube">
+          <div class="face front"><i data-lucide="code-2"></i></div>
+          <div class="face back"><i data-lucide="git-branch"></i></div>
+          <div class="face right"><i data-lucide="users"></i></div>
+          <div class="face left"><i data-lucide="database"></i></div>
+          <div class="face top"><i data-lucide="zap"></i></div>
+          <div class="face bottom"><i data-lucide="layers"></i></div>
+        </div>
+      </div>
+      <div class="visual-label">
+        <strong>Team sync</strong> · 6 members online
+      </div>
+    </div>
+  </div>
+  <div class="stats" id="dashboardStats"></div>
+  <div class="grid-2">
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Active projects</h2>
+          <p>Current team work</p>
+        </div>
+        <button class="btn btn-small" onclick="switchView('projects')" type="button">View all</button>
+      </div>
+      <div class="project-grid" id="dashboardProjects"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Team online</h2>
+          <p>Live collaboration</p>
+        </div>
+        <span class="live-dot"></span>
+      </div>
+      <div class="people" id="teamPeople"></div>
+    </div>
+  </div>
+  <div class="section-title">
+    <div>
+      <h2>Task board</h2>
+      <p>Move work from idea to shipped.</p>
+    </div>
+    <button class="btn btn-primary" onclick="openTaskModal()" type="button">
+      <i data-lucide="plus"></i>Add task</button>
+  </div>
+  <div class="kanban" id="dashboardKanban"></div>
+</section>
+
+<section class="view" id="view-projects">
+  <div class="section-title">
+    <div>
+      <h2>Projects</h2>
+      <p>Manage projects and their members.</p>
+    </div>
+    <button class="btn btn-primary" onclick="openModal('projectModal')" type="button">
+      <i data-lucide="plus"></i>Create project</button>
+  </div>
+  <div class="grid-2">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Your projects</h2>
+      </div>
+      <div class="project-grid" id="projectPageList"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Project members</h2>
+          <p>CodersMeetSpace</p>
+        </div>
+        <button class="btn btn-small" onclick="openModal('inviteModal')" type="button">
+          <i data-lucide="user-plus"></i>Invite</button>
+      </div>
+      <div class="people" id="memberList"></div>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="view-tasks">
+  <div class="section-title">
+    <div>
+      <h2>Task management</h2>
+      <p>Assign, prioritize and track every task.</p>
+    </div>
+    <button class="btn btn-primary" onclick="openTaskModal()" type="button">
+      <i data-lucide="plus"></i>New task</button>
+  </div>
+  <div class="kanban" id="mainKanban"></div>
+</section>
+
+<section class="view" id="view-chat">
+  <div class="section-title">
+    <div>
+      <h2>Team Chat</h2>
+      <p>Project conversations in one place.</p>
+    </div>
+    <div class="eyebrow" style="margin:0">
+      <span class="live-dot"></span>6 online</div>
+  </div>
+  <div class="panel chat">
+    <div class="panel-head">
+      <div>
+        <h2># development</h2>
+        <p>CodersMeetSpace team</p>
+      </div><i data-lucide="users"></i></div>
+    <div class="messages" id="messages"></div>
+    <div class="typing" id="typing">Sarah is typing...</div>
+    <form class="chat-input" onsubmit="sendMessage(event)">
+      <input id="chatInput" placeholder="Write a message..." maxlength="500" autocomplete="off">
+      <button class="btn btn-primary" type="submit">
+        <i data-lucide="send"></i>Send</button>
+    </form>
+  </div>
+</section>
+
+<section class="view" id="view-files">
+  <div class="section-title">
+    <div>
+      <h2>Project Files</h2>
+      <p>Shared resources for your team.</p>
+    </div>
+    <button class="btn btn-primary" onclick="fakeUpload()" type="button">
+      <i data-lucide="upload"></i>Upload file</button>
+  </div>
+  <div class="grid-2">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Recent files</h2>
+      </div>
+      <div class="file-list" id="fileList"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Storage</h2>
+      </div>
+      <div style="padding:22px">
+        <div style="font:600 30px var(--heading);color:var(--white)">1.8 GB</div>
+        <div class="progress">
+          <span style="width:36%"></span>
+        </div>
+        <div class="progress-meta">
+          <span>1.8 GB used</span>
+          <span>5 GB</span>
+        </div>
+        <p style="color:var(--muted);font-size:11px;margin-top:20px">Supabase Storage can be connected here for real project files.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="view-analytics">
+  <div class="section-title">
+    <div>
+      <h2>Analytics</h2>
+      <p>Understand project health and team workload.</p>
+    </div>
+  </div>
+  <div class="stats" id="analyticsStats"></div>
+  <div class="grid-2">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Weekly activity</h2>
+      </div>
+      <div class="chart">
+        <div class="bar-chart"><span style="height:38%"></span></div>
+        <div class="bar-chart"><span style="height:56%"></span></div>
+        <div class="bar-chart"><span style="height:42%"></span></div>
+        <div class="bar-chart"><span style="height:78%"></span></div>
+        <div class="bar-chart"><span style="height:63%"></span></div>
+        <div class="bar-chart"><span style="height:88%"></span></div>
+        <div class="bar-chart"><span style="height:48%"></span></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Team workload</h2>
+      </div>
+      <div style="padding:20px" id="workload"></div>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="view-activity">
+  <div class="section-title">
+    <div>
+      <h2>Activity feed</h2>
+      <p>Everything happening across your workspace.</p>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="activity-list" id="activityList"></div>
+  </div>
+</section>
+
+<section class="view" id="view-ai">
+  <div class="section-title">
+    <div>
+      <h2>AI Project Assistant</h2>
+      <p>Turn project activity into useful decisions.</p>
+    </div>
+  </div>
+  <div class="ai-panel">
+    <div class="ai-head">
+      <div class="ai-icon"><i data-lucide="sparkles"></i></div>
+      <div>
+        <h2>CodersMeet AI</h2>
+        <p>Frontend demo — connect an AI API for real responses.</p>
+      </div>
+    </div>
+    <div class="ai-prompts">
+      <button class="prompt" onclick="askAI('summary')" type="button">Summarize project</button>
+      <button class="prompt" onclick="askAI('standup')" type="button">Generate stand-up</button>
+      <button class="prompt" onclick="askAI('risks')" type="button">Find project risks</button>
+      <button class="prompt" onclick="askAI('next')" type="button">Suggest next tasks</button>
+    </div>
+    <div class="ai-result" id="aiResult">Select an AI action above.</div>
+  </div>
+</section>
+
+<section class="view" id="view-settings">
+  <div class="section-title">
+    <div>
+      <h2>Settings</h2>
+      <p>Workspace and collaboration preferences.</p>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="setting">
+      <div>
+        <strong>Real-time synchronization</strong>
+        <span>Connect Supabase Realtime to enable this.</span>
+      </div>
+      <button class="switch on" onclick="toggleSwitch(this)" type="button">
+        <span></span>
+      </button>
+    </div>
+    <div class="setting">
+      <div>
+        <strong>Task notifications</strong>
+        <span>Notify members when tasks change.</span>
+      </div>
+      <button class="switch on" onclick="toggleSwitch(this)" type="button">
+        <span></span>
+      </button>
+    </div>
+    <div class="setting">
+      <div>
+        <strong>Conflict protection</strong>
+        <span>Use task version numbers to detect simultaneous edits.</span>
+      </div>
+      <button class="btn btn-small" onclick="openModal('conflictModal')" type="button">Test conflict</button>
+    </div>
+    <div class="setting">
+      <div>
+        <strong>Demo data</strong>
+        <span>Reset the local prototype state.</span>
+      </div>
+      <button class="btn btn-small" onclick="resetDemo()" type="button">Reset</button>
+    </div>
+  </div>
+</section>
+</main>
+</div>
+
+<div class="modal" id="taskModal">
+  <div class="modal-box">
+    <h2>Create task</h2>
+    <form onsubmit="createTask(event)">
+      <div class="form-grid">
+        <div class="field full">
+          <label for="taskTitle">Task title</label>
+          <input id="taskTitle" required maxlength="100" placeholder="e.g. Build authentication">
+        </div>
+        <div class="field full">
+          <label for="taskDescription">Description</label>
+          <textarea id="taskDescription" maxlength="500" placeholder="Describe what needs to be done..."></textarea>
+        </div>
+        <div class="field">
+          <label for="taskProject">Project</label>
+          <select id="taskProject"></select>
+        </div>
+        <div class="field">
+          <label for="taskAssignee">Assignee</label>
+          <select id="taskAssignee">
+            <option>Anurag Kumar</option>
+            <option>Sarah Wilson</option>
+            <option>Alex Morgan</option>
+            <option>Rahul Sharma</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="taskPriority">Priority</label>
+          <select id="taskPriority">
+            <option value="High">High</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="taskDeadline">Deadline</label>
+          <input id="taskDeadline" type="date">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn" onclick="closeModal('taskModal')">Cancel</button>
+        <button class="btn btn-primary" type="submit">
+          <i data-lucide="plus"></i>Create task</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="projectModal">
+  <div class="modal-box">
+    <h2>Create project</h2>
+    <form onsubmit="createProject(event)">
+      <div class="field">
+        <label for="projectName">Project name</label>
+        <input id="projectName" required maxlength="60" placeholder="My new project">
+      </div>
+      <div class="field">
+        <label for="projectDescription">Description</label>
+        <textarea id="projectDescription" maxlength="300" placeholder="What is your team building?"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn" onclick="closeModal('projectModal')">Cancel</button>
+        <button class="btn btn-primary" type="submit">Create project</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="inviteModal">
+  <div class="modal-box">
+    <h2>Invite team member</h2>
+    <form onsubmit="inviteMember(event)">
+      <div class="field">
+        <label for="inviteEmail">Email address</label>
+        <input id="inviteEmail" type="email" required maxlength="100" placeholder="developer@example.com">
+      </div>
+      <div class="field">
+        <label>Role</label>
+        <select>
+          <option>Developer</option>
+          <option>Designer</option>
+          <option>Project Manager</option>
+          <option>Viewer</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn" onclick="closeModal('inviteModal')">Cancel</button>
+        <button class="btn btn-primary" type="submit">
+          <i data-lucide="send"></i>Send invite</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="profileModal">
+  <div class="modal-box">
+    <h2>Your profile</h2>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+      <img src="https://i.pravatar.cc/100?img=12" alt="Anurag Kumar" style="width:55px;height:55px;border-radius:50%">
+      <div>
+        <strong style="color:var(--white)">Anurag Kumar</strong>
+        <div style="color:var(--muted);font-size:11px">Developer</div>
+      </div>
+    </div>
+    <div class="conflict-box">
+      <h3>Demo mode</h3>
+      <p>
+        This frontend currently uses local browser data.
+        Connect Supabase Auth before treating this as production authentication.
+      </p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('profileModal')" type="button">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="taskDetailModal">
+  <div class="modal-box">
+    <h2 id="taskDetailTitle">Task details</h2>
+    <div class="conflict-box" id="taskDetailContent"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('taskDetailModal')" type="button">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="conflictModal">
+  <div class="modal-box">
+    <h2>Simultaneous edit detected</h2>
+    <div class="conflict-box">
+      <h3>Task changed by another teammate</h3>
+      <p>
+        CodersMeetSpace can use version numbers to prevent silent
+        overwrites when two people edit the same task.
+      </p>
+      <div class="version">
+        <div class="version-card">
+          <strong>Your version</strong>
+          <span>Priority: High</span>
+          <span>Version: 7</span>
+        </div>
+        <div class="version-card">
+          <strong>Latest version</strong>
+          <span>Priority: Medium</span>
+          <span>Version: 8</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('conflictModal')" type="button">Keep mine</button>
+      <button class="btn btn-primary" onclick="closeModal('conflictModal')" type="button">Use latest</button>
+      <button class="btn" onclick="closeModal('conflictModal')" type="button">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="notificationModal">
+  <div class="modal-box">
+    <h2>Notifications</h2>
+    <div class="activity-list">
+      <div class="activity-item">
+        <div class="activity-icon"><i data-lucide="user-plus"></i></div>
+        <div>
+          <strong>Sarah joined the project</strong>
+          <span>2 minutes ago</span>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-icon"><i data-lucide="message-square"></i></div>
+        <div>
+          <strong>Rahul commented on your task</strong>
+          <span>8 minutes ago</span>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-icon"><i data-lucide="check"></i></div>
+        <div>
+          <strong>Authentication task moved to Review</strong>
+          <span>15 minutes ago</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('notificationModal')" type="button">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Prevent global prototype pollution and strict mode execution
+"use strict";
+
+const STATUSES = ["Todo", "In Progress", "Review", "Done"];
+const ALLOWED_PRIORITIES = ["High", "Medium", "Low"];
+
+const avatar = Object.freeze({
+  "Anurag Kumar": "https://i.pravatar.cc/100?img=12",
+  "Sarah Wilson": "https://i.pravatar.cc/100?img=47",
+  "Alex Morgan": "https://i.pravatar.cc/100?img=32",
+  "Rahul Sharma": "https://i.pravatar.cc/100?img=11"
+});
+
+const DEFAULT_PROJECTS = [
+  { id: 1, name: "CodersMeetSpace", description: "Real-time developer collaboration workspace", progress: 72, image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=700&q=80" },
+  { id: 2, name: "Aatmanirbhar Nari", description: "Digital platform for women entrepreneurs", progress: 61, image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=700&q=80" },
+  { id: 3, name: "AI Task Assistant", description: "Intelligent project productivity assistant", progress: 38, image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=700&q=80" }
+];
+
+const DEFAULT_TASKS = [
+  { id: 1, title: "Build authentication", description: "Create secure login and registration flow.", project: "CodersMeetSpace", assignee: "Anurag Kumar", priority: "High", deadline: "2026-10-06", status: "In Progress", version: 4 },
+  { id: 2, title: "Create project dashboard", description: "Build dashboard showing project progress.", project: "CodersMeetSpace", assignee: "Sarah Wilson", priority: "High", deadline: "2026-10-07", status: "Review", version: 3 },
+  { id: 3, title: "Realtime task synchronization", description: "Connect database changes to all clients.", project: "CodersMeetSpace", assignee: "Alex Morgan", priority: "High", deadline: "2026-10-08", status: "Todo", version: 2 },
+  { id: 4, title: "Design mobile navigation", description: "Responsive navigation for smaller screens.", project: "CodersMeetSpace", assignee: "Rahul Sharma", priority: "Medium", deadline: "2026-10-09", status: "Done", version: 6 },
+  { id: 5, title: "AI project summary", description: "Generate project summary from activity.", project: "AI Task Assistant", assignee: "Anurag Kumar", priority: "Medium", deadline: "2026-10-11", status: "Todo", version: 1 },
+  { id: 6, title: "Upload project files", description: "Implement secure shared file storage.", project: "CodersMeetSpace", assignee: "Sarah Wilson", priority: "Low", deadline: "2026-10-13", status: "In Progress", version: 2 }
+];
+
+const DEFAULT_ACTIVITIES = [
+  ["check", "Sarah moved Dashboard task to Review.", "8 minutes ago"],
+  ["message-square", "Rahul commented on Authentication.", "15 minutes ago"],
+  ["user-plus", "Alex joined CodersMeetSpace.", "31 minutes ago"],
+  ["upload", "Sarah uploaded database-schema.pdf.", "1 hour ago"],
+  ["git-branch", "Authentication task was updated.", "2 hours ago"]
+];
+
+const DEFAULT_MESSAGES = [
+  { user: "Sarah Wilson", text: "Authentication UI is ready for review.", time: "10:42 AM", me: false },
+  { user: "Rahul Sharma", text: "I will test the mobile layout today.", time: "10:45 AM", me: false },
+  { user: "Anurag Kumar", text: "Great. Let's connect Supabase after the UI is stable.", time: "10:47 AM", me: true }
+];
+
+const DEFAULT_FILES = [
+  ["database-schema.pdf", "PDF", "2.4 MB", "Sarah Wilson"],
+  ["project-wireframe.fig", "FIG", "4.1 MB", "Rahul Sharma"],
+  ["api-documentation.md", "MD", "18 KB", "Anurag Kumar"],
+  ["hackathon-presentation.pptx", "PPTX", "6.7 MB", "Alex Morgan"]
+];
+
+const DEFAULT_MEMBERS = [
+  ["Anurag Kumar", "Lead Developer", true],
+  ["Sarah Wilson", "Frontend Developer", true],
+  ["Alex Morgan", "Backend Developer", true],
+  ["Rahul Sharma", "UI/UX Developer", true],
+  ["Priya Singh", "QA", false]
+];
+
+let projects = [...DEFAULT_PROJECTS];
+let tasks = [...DEFAULT_TASKS];
+let activities = [...DEFAULT_ACTIVITIES];
+let messages = [...DEFAULT_MESSAGES];
+let files = [...DEFAULT_FILES];
+let members = [...DEFAULT_MEMBERS];
+
+const STORAGE_KEY = "codersmeetspace-v3";
+
+/* --- Security & Sanitization Helpers --- */
+
+// HTML entity encoding to prevent DOM XSS injection
+const esc = value => {
+  if (value === null || value === undefined) return "";
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  }[char]));
+};
+
+// URL validation to prevent javascript: or data: URI execution
+function safeUrl(url, fallback = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=700&q=80") {
+  if (!url || typeof url !== "string") return fallback;
+  try {
+    const parsed = new URL(url.trim(), window.location.href);
+    if (parsed.protocol === "https:" || (parsed.protocol === "http:" && parsed.hostname === "localhost")) {
+      return esc(parsed.href);
+    }
+  } catch (e) {}
+  return fallback;
+}
+
+// Icon identifier whitelist sanitizer
+function safeIcon(iconName) {
+  return /^[a-z0-9-]+$/.test(iconName) ? iconName : "activity";
+}
+
+function save() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ projects, tasks, activities, messages, files, members }));
+  } catch (err) {
+    console.warn("Storage quota exceeded or storage unavailable.", err);
+  }
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (typeof data !== "object" || data === null) return;
+
+    if (Array.isArray(data.projects)) projects = data.projects;
+    if (Array.isArray(data.tasks)) tasks = data.tasks;
+    if (Array.isArray(data.activities)) activities = data.activities;
+    if (Array.isArray(data.messages)) messages = data.messages;
+    if (Array.isArray(data.files)) files = data.files;
+    if (Array.isArray(data.members)) members = data.members;
+  } catch (e) {
+    console.error("Malformed state in storage. Falling back to defaults.", e);
+    resetDemo();
+  }
+}
+
+const $ = id => document.getElementById(id);
+
+function toast(message) {
+  const el = $("toast");
+  el.textContent = message;
+  el.classList.add("show");
+  clearTimeout(window.toastTimer);
+  window.toastTimer = setTimeout(() => el.classList.remove("show"), 2300);
+}
+
+function switchView(view) {
+  const validViews = ["dashboard", "projects", "tasks", "chat", "files", "analytics", "activity", "ai", "settings"];
+  if (!validViews.includes(view)) return;
+
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  const target = $("view-" + view);
+  if (target) target.classList.add("active");
+  document.querySelectorAll(".nav button").forEach(button => {
+    button.classList.toggle("active", button.dataset.view === view);
+  });
+
+  const names = {
+    dashboard: "Dashboard",
+    projects: "Projects",
+    tasks: "Tasks",
+    chat: "Team Chat",
+    files: "Files",
+    analytics: "Analytics",
+    activity: "Activity",
+    ai: "AI Assistant",
+    settings: "Settings"
+  };
+  $('pageName').textContent = names[view] || "Dashboard";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  renderAll();
+}
+
+function renderStats() {
+  const total = tasks.length;
+  const done = tasks.filter(t => t.status === "Done").length;
+  const review = tasks.filter(t => t.status === "Review").length;
+  const open = Math.max(0, total - done);
+  const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  const html = `
+    <div class="stat primary">
+      <div class="stat-label">
+        Workspace completion
+        <i data-lucide="target"></i>
+      </div>
+      <div class="stat-number">${Number(percent)}%</div>
+      <div class="stat-note">${Number(done)} of ${Number(total)} tasks completed</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">
+        Projects
+        <i data-lucide="layers"></i>
+      </div>
+      <div class="stat-number">${Number(projects.length)}</div>
+      <div class="stat-note">active workspaces</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">
+        Open tasks
+        <i data-lucide="circle-dot"></i>
+      </div>
+      <div class="stat-number">${Number(open)}</div>
+      <div class="stat-note">need attention</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">
+        In review
+        <i data-lucide="eye"></i>
+      </div>
+      <div class="stat-number">${Number(review)}</div>
+      <div class="stat-note">waiting for review</div>
+    </div>
+  `;
+  $("dashboardStats").innerHTML = html;
+  $('analyticsStats').innerHTML = html;
+}
+
+function projectCard(project) {
+  const projectTasks = tasks.filter(t => t.project === project.name);
+  const done = projectTasks.filter(t => t.status === "Done").length;
+  const progress = projectTasks.length ? Math.round((done / projectTasks.length) * 100) : Number(project.progress) || 0;
+  const clampedProgress = Math.max(0, Math.min(100, progress));
+
+  return `
+    <div class="project-card">
+      <img class="project-image" src="${safeUrl(project.image)}" alt="${esc(project.name)}">
+      <div class="project-top">
+        <div>
+          <div class="project-title">${esc(project.name)}</div>
+          <div class="project-description">${esc(project.description)}</div>
+        </div>
+        <i data-lucide="more-horizontal"></i>
+      </div>
+      <div class="progress">
+        <span style="width:${clampedProgress}%"></span>
+      </div>
+      <div class="progress-meta">
+        <span>${clampedProgress}% complete</span>
+        <span>${Number(projectTasks.length)} tasks</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderProjects() {
+  $("dashboardProjects").innerHTML = projects.slice(0, 4).map(projectCard).join("");
+  $('projectPageList').innerHTML = projects.map(projectCard).join("");
+  const select = $("taskProject");
+  if (select) {
+    select.innerHTML = projects.map(p => `<option value="${esc(p.name)}">${esc(p.name)}</option>`).join("");
+  }
+}
+
+function renderPeople() {
+  const renderItem = person => {
+    const name = String(person[0] || "");
+    const role = String(person[1] || "");
+    const isOnline = Boolean(person[2]);
+    const photo = safeUrl(avatar[name] || "https://i.pravatar.cc/100");
+
+    return `
+      <div class="person">
+        <img class="avatar" src="${photo}" alt="${esc(name)}">
+        <div class="person-info">
+          <strong>${esc(name)}</strong>
+          <span>${esc(role)}</span>
+        </div>
+        <span class="online" style="background:${isOnline ? 'var(--green)' : 'var(--muted)'}"></span>
+      </div>
+    `;
+  };
+  $("teamPeople").innerHTML = members.slice(0, 5).map(renderItem).join("");
+  $('memberList').innerHTML = members.map(renderItem).join("");
+}
+
+function taskCard(task) {
+  const statusIndex = STATUSES.indexOf(task.status);
+  const rawPriority = String(task.priority || "Medium");
+  const priority = ALLOWED_PRIORITIES.includes(rawPriority) ? rawPriority : "Medium";
+  const priorityClass = priority.toLowerCase();
+  const assigneeName = String(task.assignee || "Unassigned");
+  const assigneeAvatar = safeUrl(avatar[assigneeName] || "https://i.pravatar.cc/100");
+  const taskId = Number(task.id);
+
+  return `
+    <div class="task-card">
+      <div class="task-title">${esc(task.title)}</div>
+      <div class="task-description">${esc(task.description)}</div>
+      <div class="task-meta">
+        <span class="tag ${priorityClass}">${esc(priority)}</span>
+        <span class="task-assignee">
+          <img src="${assigneeAvatar}" alt="">${esc(assigneeName.split(" ")[0])}
+        </span>
+      </div>
+      <div class="task-bottom">
+        <span class="task-date">
+          <i data-lucide="calendar-days"></i>${esc(task.deadline || "No deadline")}
+        </span>
+        <div class="task-controls">
+          ${statusIndex > 0 ? `
+            <button class="mini-btn" onclick="moveTask(${taskId}, -1)" title="Move left" type="button">
+              <i data-lucide="arrow-left"></i>
+            </button>
+          ` : ""}
+          <button class="mini-btn" onclick="openTaskDetail(${taskId})" title="Open task" type="button">
+            <i data-lucide="external-link"></i>
+          </button>
+          ${statusIndex < STATUSES.length - 1 ? `
+            <button class="mini-btn" onclick="moveTask(${taskId}, 1)" title="Move right" type="button">
+              <i data-lucide="arrow-right"></i>
+            </button>
+          ` : ""}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderKanban(target) {
+  const searchInput = $("globalSearch").value.toLowerCase().trim().slice(0, 80);
+  $(target).innerHTML = STATUSES.map(status => {
+    const filtered = tasks.filter(task => {
+      const matchesStatus = task.status === status;
+      const haystack = (
+        String(task.title || "") + 
+        String(task.description || "") + 
+        String(task.project || "") + 
+        String(task.assignee || "")
+      ).toLowerCase();
+      const matchesSearch = !searchInput || haystack.includes(searchInput);
+      return matchesStatus && matchesSearch;
+    });
+
+    return `
+      <div class="column">
+        <div class="column-header">
+          <span>${esc(status)}</span>
+          <span class="column-count">${Number(filtered.length)}</span>
+        </div>
+        ${filtered.length ? filtered.map(taskCard).join("") : `
+          <div style="color:var(--muted);padding:25px 7px;font-size:11px">No tasks here</div>
+        `}
+      </div>
+    `;
+  }).join("");
+}
+
+function moveTask(id, direction) {
+  const numericId = Number(id);
+  const task = tasks.find(t => Number(t.id) === numericId);
+  if (!task) return;
+
+  const current = STATUSES.indexOf(task.status);
+  if (current === -1) return;
+
+  const next = Math.max(0, Math.min(STATUSES.length - 1, current + Number(direction)));
+  task.status = STATUSES[next];
+  task.version = (Number(task.version) || 1) + 1;
+
+  activities.unshift([
+    "move-right",
+    `${task.assignee} moved "${task.title}" to ${task.status}.`,
+    "Just now"
+  ]);
+  activities = activities.slice(0, 10);
+
+  save();
+  renderAll();
+  toast(`Task moved to ${task.status}`);
+}
+
+function openTaskModal() {
+  openModal("taskModal");
+  setTimeout(() => $('taskTitle').focus(), 100);
+}
+
+function createTask(event) {
+  event.preventDefault();
+  const title = $("taskTitle").value.trim().slice(0, 100);
+  const description = $('taskDescription').value.trim().slice(0, 500);
+  const project = $("taskProject").value;
+  const assignee = $('taskAssignee').value;
+  const priorityRaw = $("taskPriority").value;
+  const priority = ALLOWED_PRIORITIES.includes(priorityRaw) ? priorityRaw : "Medium";
+  const deadlineRaw = $('taskDeadline').value;
+  const deadline = /^\d{4}-\d{2}-\d{2}$/.test(deadlineRaw) ? deadlineRaw : "";
+
+  if (!title) return;
+
+  const task = {
+    id: Date.now(),
+    title,
+    description,
+    project,
+    assignee,
+    priority,
+    deadline,
+    status: "Todo",
+    version: 1
+  };
+
+  tasks.unshift(task);
+  activities.unshift(["plus", `Created "${task.title}".`, "Just now"]);
+  closeModal("taskModal");
+  save();
+  renderAll();
+  event.target.reset();
+  toast("Task created successfully");
+}
+
+function openTaskDetail(id) {
+  const numericId = Number(id);
+  const task = tasks.find(t => Number(t.id) === numericId);
+  if (!task) return;
+
+  $("taskDetailTitle").textContent = task.title;
+  $("taskDetailContent").innerHTML = `
+    <h3>${esc(task.title)}</h3>
+    <p>${esc(task.description || "No description provided.")}</p>
+    <div style="margin-top:14px"><strong style="color:var(--white)">Project: </strong>${esc(task.project)}</div>
+    <div style="margin-top:6px"><strong style="color:var(--white)">Assignee: </strong>${esc(task.assignee)}</div>
+    <div style="margin-top:6px"><strong style="color:var(--white)">Priority: </strong>${esc(task.priority)}</div>
+    <div style="margin-top:6px"><strong style="color:var(--white)">Deadline: </strong>${esc(task.deadline || "Not set")}</div>
+    <div style="margin-top:6px"><strong style="color:var(--white)">Version: </strong>v${Number(task.version) || 1}</div>
+    <hr style="border:0;border-top:1px solid var(--line);margin:17px 0">
+    <strong style="color:var(--white)">Comments</strong>
+    <p style="margin-top:8px">Sarah: Please review the API contract before merging.</p>
+    <p style="margin-top:7px">Rahul: Mobile layout is ready.</p>
+  `;
+  openModal("taskDetailModal");
+}
+
+function renderMessages() {
+  $("messages").innerHTML = messages.map(message => {
+    const user = String(message.user || "Teammate");
+    const photo = safeUrl(avatar[user] || "https://i.pravatar.cc/100");
+    const isMe = Boolean(message.me);
+
+    return `
+      <div class="message ${isMe ? "me" : ""}">
+        <img src="${photo}" alt="">
+        <div class="message-body">
+          <strong>${esc(user)}</strong>
+          <p>${esc(message.text)}</p>
+          <small>${esc(message.time)}</small>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function sendMessage(event) {
+  event.preventDefault();
+  const input = $('chatInput');
+  const text = input.value.trim().slice(0, 500);
+  if (!text) return;
+
+  messages.push({
+    user: "Anurag Kumar",
+    text,
+    time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    me: true
+  });
+
+  activities.unshift(["message-square", "You sent a message in #development.", "Just now"]);
+  input.value = "";
+  save();
+  renderAll();
+
+  setTimeout(() => {
+    $("typing").textContent = "Sarah is typing...";
+  }, 300);
+}
+
+function renderFiles() {
+  $('fileList').innerHTML = files.map(file => `
+    <div class="file">
+      <div class="file-icon"><i data-lucide="file-text"></i></div>
+      <div class="file-info">
+        <strong>${esc(file[0])}</strong>
+        <span>${esc(file[1])} · ${esc(file[2])} · ${esc(file[3])}</span>
+      </div>
+      <button class="mini-btn" type="button"><i data-lucide="download"></i></button>
+    </div>
+  `).join("");
+}
+
+function fakeUpload() {
+  files.unshift(["new-project-file.pdf", "PDF", "1.2 MB", "Anurag Kumar"]);
+  activities.unshift(["upload", "You uploaded new-project-file.pdf.", "Just now"]);
+  save();
+  renderAll();
+  toast("Demo upload added — connect Supabase Storage for real uploads.");
+}
+
+function renderActivity() {
+  $("activityList").innerHTML = activities.map(item => `
+    <div class="activity-item">
+      <div class="activity-icon">
+        <i data-lucide="${safeIcon(item[0])}"></i>
+      </div>
+      <div>
+        <strong>${esc(item[1])}</strong>
+        <span>${esc(item[2])}</span>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderWorkload() {
+  const people = members.map(member => [
+    member[0],
+    tasks.filter(t => t.assignee === member[0]).length
+  ]);
+  const max = Math.max(1, ...people.map(p => p[1]));
+
+  $('workload').innerHTML = people.map(person => {
+    const count = Number(person[1]) || 0;
+    const pct = Math.max(0, Math.min(100, Math.round((count / max) * 100)));
+    return `
+      <div style="margin-bottom:17px">
+        <div style="display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-bottom:5px">
+          <span>${esc(person[0])}</span>
+          <span>${count} tasks</span>
+        </div>
+        <div class="progress">
+          <span style="width:${pct}%"></span>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function askAI(type) {
+  const result = $("aiResult");
+  const total = tasks.length;
+  const done = tasks.filter(t => t.status === "Done").length;
+  const review = tasks.filter(t => t.status === "Review").length;
+  const todo = tasks.filter(t => t.status === "Todo").length;
+  const responses = {
+    summary: `PROJECT SUMMARY\nCodersMeetSpace currently has ${total} tracked tasks.\n${done} tasks are completed.\n${review} tasks are waiting for review.\n${todo} tasks are still in Todo.\nThe highest priority area is completing the remaining review and authentication work.`,
+    standup: `DAILY STAND-UP\nYesterday:\n• Dashboard UI was improved.\n• Team collaboration screens were added.\nToday:\n• Connect authentication.\n• Implement realtime task synchronization.\n• Test mobile experience.\nPotential blocker:\n• Backend integration is still required.`,
+    risks: `PROJECT RISKS\n1. Authentication is not connected yet.\n2. Realtime synchronization needs backend integration.\n3. File uploads require secure storage.\n4. Conflict resolution must be validated server-side.\nRecommended:\nFinish the Supabase foundation before adding more UI features.`,
+    next: `SUGGESTED NEXT TASKS\n1. Create Supabase database schema.\n2. Implement authentication.\n3. Add project membership and RLS.\n4. Connect Realtime subscriptions.\n5. Add Storage for project files.\n6. Connect an AI API to this assistant.`
+  };
+  result.textContent = responses[type] || "Select an AI action above.";
+}
+
+function createProject(event) {
+  event.preventDefault();
+  const name = $('projectName').value.trim().slice(0, 60);
+  const description = $("projectDescription").value.trim().slice(0, 300);
+  if (!name) return;
+
+  projects.push({
+    id: Date.now(),
+    name,
+    description: description || "New team project",
+    progress: 0,
+    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=700&q=80"
+  });
+
+  activities.unshift(["folder-plus", `Created project "${name}".`, "Just now"]);
+  closeModal("projectModal");
+  event.target.reset();
+  save();
+  renderAll();
+  toast("Project created");
+}
+
+function inviteMember(event) {
+  event.preventDefault();
+  const email = $('inviteEmail').value.trim().slice(0, 100);
+  closeModal("inviteModal");
+  event.target.reset();
+  toast(`Invitation prepared for ${email}. Connect Supabase Auth for real invitations.`);
+}
+
+function showNotifications() {
+  openModal("notificationModal");
+}
+
+function openModal(id) {
+  const modal = $(id);
+  if (modal) modal.classList.add("show");
+}
+
+function closeModal(id) {
+  const modal = $(id);
+  if (modal) modal.classList.remove("show");
+}
+
+document.querySelectorAll(".modal").forEach(modal => {
+  modal.addEventListener("click", event => {
+    if (event.target === modal) modal.classList.remove("show");
+  });
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") {
+    document.querySelectorAll(".modal.show").forEach(modal => modal.classList.remove("show"));
+  }
+});
+
+function toggleSwitch(button) {
+  button.classList.toggle("on");
+}
+
+function resetDemo() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (e) {}
+  location.reload();
+}
+
+$("globalSearch").addEventListener("input", () => {
+  renderKanban("dashboardKanban");
+  renderKanban("mainKanban");
+  if (window.lucide) lucide.createIcons();
+});
+
+document.querySelectorAll(".nav button").forEach(button => {
+  button.addEventListener("click", () => switchView(button.dataset.view));
+});
+
+function renderAll() {
+  renderStats();
+  renderProjects();
+  renderPeople();
+  renderKanban("dashboardKanban");
+  renderKanban("mainKanban");
+  renderMessages();
+  renderFiles();
+  renderActivity();
+  renderWorkload();
+  $('taskCount').textContent = tasks.filter(t => t.status !== "Done").length;
+  if (window.lucide) lucide.createIcons();
+}
+
+load();
+renderAll();
+</script>
+</body>
+</html>
